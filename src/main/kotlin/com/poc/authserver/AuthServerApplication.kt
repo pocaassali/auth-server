@@ -1,4 +1,4 @@
-package com.poc.auth_server
+package com.poc.authserver
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

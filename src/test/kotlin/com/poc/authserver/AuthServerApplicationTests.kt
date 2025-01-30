@@ -1,4 +1,4 @@
-package com.poc.auth_server
+package com.poc.authserver
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
