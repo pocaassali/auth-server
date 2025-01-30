@@ -1,6 +1,5 @@
 package com.poc.authserver.users.infrastructure.api
 
-import com.poc.authserver.users.core.domain.model.User
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 

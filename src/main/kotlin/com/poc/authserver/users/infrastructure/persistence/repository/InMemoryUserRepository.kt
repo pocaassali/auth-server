@@ -2,6 +2,7 @@ package com.poc.authserver.users.infrastructure.persistence.repository
 
 import com.poc.authserver.users.core.application.ports.output.Users
 import com.poc.authserver.users.core.domain.model.User
+import com.poc.authserver.users.core.domain.valueobject.Credentials
 import com.poc.authserver.users.infrastructure.persistence.entity.UserEntity
 import org.springframework.stereotype.Repository
 import java.util.*
@@ -37,5 +38,15 @@ class InMemoryUserRepository : Users {
     override fun delete(id: UUID) {
         val userToDelete = users.entries.find { UUID.fromString(it.value.identifier) == id }
         userToDelete?.let { users.remove(it.key) }
+    }
+
+    override fun findByCredentials(credentials: Credentials): User? {
+        val foundUser = users.entries.find { it.value.mail == credentials.mail }
+        if (foundUser != null) {
+            if(foundUser.value.password == credentials.password) {
+                return foundUser.value.toUser()
+            }
+        }
+        return null
     }
 }
