@@ -10,13 +10,14 @@ data class CreateUserCommand(
     val identifier : String,
     val mail : String,
     val password : String,
+    val encryptedPassword : String,
     val role : String,
 ) {
     fun toUser(): User {
         return User(
             identifier = UUID.fromString(identifier),
             mail = Mail(mail),
-            password = Password(password),
+            password = Password(encryptedPassword),
             role = UserRole.valueOf(role),
         )
     }

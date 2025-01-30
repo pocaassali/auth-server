@@ -10,8 +10,14 @@ data class UserCreationRequest(
     val password : String,
     val role : String,
 ) {
-    fun toCommand() : CreateUserCommand {
-        return CreateUserCommand(identifier, mail, password ,role)
+    fun toCommand(encryptedPassword : String) : CreateUserCommand {
+        return CreateUserCommand(
+            identifier = identifier,
+            mail = mail,
+            password = password,
+            encryptedPassword = encryptedPassword,
+            role = role,
+        )
     }
 }
 

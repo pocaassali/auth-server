@@ -11,10 +11,19 @@ import java.util.*
 class InMemoryUserRepository : Users {
 
     private val users = mutableMapOf(
-        Pair(1L,
-            UserEntity(identifier = "bd657168-e573-4925-900a-d5f26e82760b", mail = "alice@mail.fr", password = "654321", role = "ADMIN")
+        Pair(1L, UserEntity(
+                identifier = "bd657168-e573-4925-900a-d5f26e82760b",
+                mail = "alice@mail.fr",
+                password = "\$2a\$10\$h98/Ebg03XPpvGZA9sujauaxPpr.YoIfNCw/WpGO/tae.tbSdoNZi",
+                role = "ADMIN"
+            )
         ),
-        Pair(2L,UserEntity(identifier = "40c273b3-c4fc-4227-9523-e4782a7f2c20", mail = "bob@mail.com", password = "123456", role = "USER"))
+        Pair(2L, UserEntity(
+            identifier = "40c273b3-c4fc-4227-9523-e4782a7f2c20",
+            mail = "bob@mail.com",
+            password = "\$2a\$10\$HTEK6eWAfx3iCApN1cZ1Y.r8juYvhkvg2SRDfQXJwBOBe7ujAsuTa",
+            role = "USER"
+        ))
     )
 
     override fun save(user: User): User? {
@@ -44,11 +53,6 @@ class InMemoryUserRepository : Users {
 
     override fun findByCredentials(credentials: Credentials): User? {
         val foundUser = users.entries.find { it.value.mail == credentials.mail }
-        if (foundUser != null) {
-            if(foundUser.value.password == credentials.password) {
-                return foundUser.value.toUser()
-            }
-        }
-        return null
+        return foundUser?.value?.toUser()
     }
 }
