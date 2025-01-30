@@ -10,14 +10,15 @@ import com.poc.authserver.users.core.domain.model.User
 
 class UserApplicationServiceImpl(
     private val createUser : CreateUser,
-    private val getAllUsers : GetAllUsers
+    private val getAllUsers : GetAllUsers,
+    private val getUserById : GetUserById
 ) : UserApplicationService {
     override fun getAllUsers(): List<User> {
         return getAllUsers.handle(GetAllUsersQuery())
     }
 
     override fun getUserById(query: GetUserByIdQuery): User? {
-        TODO("Not yet implemented")
+        return getUserById.handle(query)
     }
 
     override fun createUser(command: CreateUserCommand): User {

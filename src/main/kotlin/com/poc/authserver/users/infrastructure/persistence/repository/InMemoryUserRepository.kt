@@ -4,6 +4,7 @@ import com.poc.authserver.users.core.application.ports.output.Users
 import com.poc.authserver.users.core.domain.model.User
 import com.poc.authserver.users.infrastructure.persistence.entity.UserEntity
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class InMemoryUserRepository : Users {
@@ -21,5 +22,9 @@ class InMemoryUserRepository : Users {
 
     override fun findAll(): List<User> {
         return users.map { it.value.toUser() }
+    }
+
+    override fun findById(id: UUID): User? {
+        return users.values.find { it.identifier == id.toString() }?.toUser()
     }
 }
