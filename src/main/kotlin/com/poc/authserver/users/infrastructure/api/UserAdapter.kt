@@ -1,5 +1,6 @@
 package com.poc.authserver.users.infrastructure.api
 
+import com.poc.authserver.users.core.application.dto.command.DeleteUserCommand
 import com.poc.authserver.users.core.application.dto.query.GetUserByIdQuery
 import com.poc.authserver.users.core.application.ports.input.UserApplicationService
 import org.springframework.stereotype.Component
@@ -23,5 +24,9 @@ class UserAdapter(
 
     fun update(id: String, request: UserEditionRequest): UserView? {
         return userApplicationService.updateUser(request.toCommand(id))?.let { UserView.from(it) }
+    }
+
+    fun delete(id: String) {
+        userApplicationService.deleteUser(DeleteUserCommand(id))
     }
 }

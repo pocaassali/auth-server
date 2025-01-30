@@ -13,6 +13,7 @@ class UserApplicationServiceImpl(
     private val getAllUsers : GetAllUsers,
     private val getUserById : GetUserById,
     private val updateUser : UpdateUser,
+    private val deleteUser : DeleteUser,
 ) : UserApplicationService {
     override fun getAllUsers(): List<User> {
         return getAllUsers.handle(GetAllUsersQuery())
@@ -31,6 +32,7 @@ class UserApplicationServiceImpl(
     }
 
     override fun deleteUser(command: DeleteUserCommand) {
-        TODO("Not yet implemented")
+        deleteUser.handle(command)
+        return
     }
 }

@@ -8,4 +8,5 @@ interface Users {
     fun findAll(): List<User>
     fun findById(id: UUID): User?
     fun update(user: User): User?
+    fun delete(id: UUID)
 }

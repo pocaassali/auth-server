@@ -1,5 +1,3 @@
 package com.poc.authserver.users.core.application.dto.command
 
-class DeleteUserCommand {
-
-}
+data class DeleteUserCommand(val id : String)

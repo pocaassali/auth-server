@@ -33,4 +33,9 @@ class InMemoryUserRepository : Users {
         userToUpdate?.let { users[it.key] = UserEntity.from(user) }
         return users[userToUpdate?.key]?.toUser()
     }
+
+    override fun delete(id: UUID) {
+        val userToDelete = users.entries.find { UUID.fromString(it.value.identifier) == id }
+        userToDelete?.let { users.remove(it.key) }
+    }
 }

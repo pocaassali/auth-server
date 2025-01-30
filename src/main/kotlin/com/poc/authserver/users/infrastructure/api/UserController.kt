@@ -26,12 +26,13 @@ class UserController(
     }
 
     @PutMapping("/{id}")
-    fun updateUser(@PathVariable id: String,@RequestBody request: UserEditionRequest): ResponseEntity<UserView?>{
+    fun updateUser(@PathVariable id: String, @RequestBody request: UserEditionRequest): ResponseEntity<UserView?>{
         return ResponseEntity.ok(userAdapter.update(id, request))
     }
 
-    /*@GetMapping
-    fun getUsers(): ResponseEntity<List<UserView>>{
-
-    }*/
+    @DeleteMapping("/{id}")
+    fun deleteUser(@PathVariable id: String): ResponseEntity<String>{
+        userAdapter.delete(id)
+        return ResponseEntity.ok("User with id: $id has been deleted")
+    }
 }
