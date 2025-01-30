@@ -4,7 +4,7 @@ import com.poc.authserver.users.core.domain.model.User
 import java.util.*
 
 interface Users {
-    fun save(user: User): User
+    fun save(user: User): User?
     fun findAll(): List<User>
     fun findById(id: UUID): User?
 }

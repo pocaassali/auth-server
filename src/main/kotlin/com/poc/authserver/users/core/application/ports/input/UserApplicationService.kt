@@ -9,7 +9,7 @@ import com.poc.authserver.users.core.domain.model.User
 interface UserApplicationService {
     fun getAllUsers(): List<User>
     fun getUserById(query: GetUserByIdQuery): User?
-    fun createUser(command: CreateUserCommand): User
+    fun createUser(command: CreateUserCommand): User?
     fun updateUser(command: UpdateUserCommand): User?
     fun deleteUser(command: DeleteUserCommand)
 }

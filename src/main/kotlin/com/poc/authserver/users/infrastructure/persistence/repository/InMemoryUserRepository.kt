@@ -14,10 +14,10 @@ class InMemoryUserRepository : Users {
         Pair(2L,UserEntity(identifier = "40c273b3-c4fc-4227-9523-e4782a7f2c20", mail = "bob@mail.com", password = "123456", role = "USER"))
     )
 
-    override fun save(user: User): User {
+    override fun save(user: User): User? {
         val id = (users.size+1).toLong()
         users[id] = UserEntity.from(user)
-        return users[id]?.toUser() ?: user
+        return users[id]?.toUser()
     }
 
     override fun findAll(): List<User> {

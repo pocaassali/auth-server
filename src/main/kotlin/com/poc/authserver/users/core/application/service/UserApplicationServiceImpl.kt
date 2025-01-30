@@ -21,8 +21,8 @@ class UserApplicationServiceImpl(
         return getUserById.handle(query)
     }
 
-    override fun createUser(command: CreateUserCommand): User {
-        TODO("Not yet implemented")
+    override fun createUser(command: CreateUserCommand): User? {
+        return createUser.handle(command)
     }
 
     override fun updateUser(command: UpdateUserCommand): User? {
