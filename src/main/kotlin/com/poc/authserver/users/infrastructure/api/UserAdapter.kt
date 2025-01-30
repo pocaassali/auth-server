@@ -7,4 +7,7 @@ import org.springframework.stereotype.Component
 class UserAdapter(
     private val userApplicationService: UserApplicationService
 ) {
+    fun getAllUsers(): List<UserView> {
+        return userApplicationService.getAllUsers().map { UserView.from(it) }
+    }
 }
