@@ -1,10 +1,7 @@
 package com.poc.authserver.users.config
 
 import com.poc.authserver.users.core.application.ports.output.Users
-import com.poc.authserver.users.core.application.service.CreateUser
-import com.poc.authserver.users.core.application.service.GetAllUsers
-import com.poc.authserver.users.core.application.service.GetUserById
-import com.poc.authserver.users.core.application.service.UserApplicationServiceImpl
+import com.poc.authserver.users.core.application.service.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -16,7 +13,13 @@ class CoreConfig {
         createUser : CreateUser,
         getAllUsers: GetAllUsers,
         getUserById: GetUserById,
-    ) = UserApplicationServiceImpl(createUser = createUser, getAllUsers = getAllUsers, getUserById = getUserById)
+        updateUser: UpdateUser,
+    ) = UserApplicationServiceImpl(
+        createUser = createUser,
+        getAllUsers = getAllUsers,
+        getUserById = getUserById,
+        updateUser = updateUser,
+    )
 
     @Bean
     fun createUser(users: Users) = CreateUser(users = users)
@@ -26,4 +29,7 @@ class CoreConfig {
 
     @Bean
     fun getUserById(users: Users) = GetUserById(users = users)
+
+    @Bean
+    fun updateUser(users: Users) = UpdateUser(users = users)
 }

@@ -11,7 +11,8 @@ import com.poc.authserver.users.core.domain.model.User
 class UserApplicationServiceImpl(
     private val createUser : CreateUser,
     private val getAllUsers : GetAllUsers,
-    private val getUserById : GetUserById
+    private val getUserById : GetUserById,
+    private val updateUser : UpdateUser,
 ) : UserApplicationService {
     override fun getAllUsers(): List<User> {
         return getAllUsers.handle(GetAllUsersQuery())
@@ -26,7 +27,7 @@ class UserApplicationServiceImpl(
     }
 
     override fun updateUser(command: UpdateUserCommand): User? {
-        TODO("Not yet implemented")
+        return updateUser.handle(command)
     }
 
     override fun deleteUser(command: DeleteUserCommand) {

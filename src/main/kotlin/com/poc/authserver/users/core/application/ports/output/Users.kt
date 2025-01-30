@@ -7,4 +7,5 @@ interface Users {
     fun save(user: User): User?
     fun findAll(): List<User>
     fun findById(id: UUID): User?
+    fun update(user: User): User?
 }

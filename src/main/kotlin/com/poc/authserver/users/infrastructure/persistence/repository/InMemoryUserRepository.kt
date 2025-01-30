@@ -27,4 +27,10 @@ class InMemoryUserRepository : Users {
     override fun findById(id: UUID): User? {
         return users.values.find { it.identifier == id.toString() }?.toUser()
     }
+
+    override fun update(user: User): User? {
+        val userToUpdate = users.entries.find { UUID.fromString(it.value.identifier) == user.identifier }
+        userToUpdate?.let { users[it.key] = UserEntity.from(user) }
+        return users[userToUpdate?.key]?.toUser()
+    }
 }

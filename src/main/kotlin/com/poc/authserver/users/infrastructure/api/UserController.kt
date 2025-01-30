@@ -25,12 +25,12 @@ class UserController(
         return ResponseEntity.ok(userAdapter.create(request))
     }
 
-    /*@GetMapping
-    fun getUsers(): ResponseEntity<List<UserView>>{
-
+    @PutMapping("/{id}")
+    fun updateUser(@PathVariable id: String,@RequestBody request: UserEditionRequest): ResponseEntity<UserView?>{
+        return ResponseEntity.ok(userAdapter.update(id, request))
     }
 
-    @GetMapping
+    /*@GetMapping
     fun getUsers(): ResponseEntity<List<UserView>>{
 
     }*/

@@ -20,4 +20,8 @@ class UserAdapter(
     fun create(request: UserCreationRequest): UserView? {
         return userApplicationService.createUser(request.toCommand())?.let { UserView.from(it) }
     }
+
+    fun update(id: String, request: UserEditionRequest): UserView? {
+        return userApplicationService.updateUser(request.toCommand(id))?.let { UserView.from(it) }
+    }
 }
