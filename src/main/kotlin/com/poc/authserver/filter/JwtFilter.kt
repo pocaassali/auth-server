@@ -1,18 +1,18 @@
 package com.poc.authserver.filter
 
+import com.poc.authserver.utils.CustomUserDetailsService
 import com.poc.authserver.utils.JwtUtil
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
-class JwtFilter(private val jwtUtil: JwtUtil, private val userDetailsService: UserDetailsService) : OncePerRequestFilter() {
+class JwtFilter(private val jwtUtil: JwtUtil, private val customUserDetailsService: CustomUserDetailsService) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -32,13 +32,13 @@ class JwtFilter(private val jwtUtil: JwtUtil, private val userDetailsService: Us
         println("🟡 JWT détecté pour : $username")
 
         if (username != null && SecurityContextHolder.getContext().authentication == null) {
-            val userDetails = userDetailsService.loadUserByUsername(username)
+            val customUserDetails = customUserDetailsService.loadUserByUsername(username)
 
-            if (jwtUtil.validateToken(token, userDetails)) {
-                val authToken = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+            if (jwtUtil.isTokenValid(token, customUserDetails)) {
+                val authToken = UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.authorities)
                 authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = authToken
-                println("✅ Authentification réussie pour : ${userDetails.username}")
+                println("✅ Authentification réussie pour : ${customUserDetails.username}")
             } else {
                 println("🔴 Token invalide pour $username")
             }

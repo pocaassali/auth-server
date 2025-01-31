@@ -9,7 +9,6 @@ class AuthServerSecurityGuard {
         val authentication = SecurityContextHolder.getContext().authentication
         val principal = authentication.principal
 
-        //TODO : adapte with customUserDetails
         if (principal is CustomUserDetails) {
             return principal.userId == userId || authentication.authorities.any { it.authority == "ROLE_ADMIN" }
         }

@@ -17,8 +17,8 @@ class AuthAdapter(
         val user = authApplicationService.getUserByCredentials(request.toQuery())
         if (user != null) {
             if (passwordEncoder.matches(request.password,user.password.value)){
-                val userDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
-                val token = jwtUtil.generateToken(userDetails)
+                val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
+                val token = jwtUtil.generateToken(customUserDetails)
                 return AccessTokenResponse(token)
             }
         }

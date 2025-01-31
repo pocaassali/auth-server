@@ -3,13 +3,14 @@ package com.poc.authserver.utils
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.security.Keys
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
+import java.security.Key
 import java.util.*
-import javax.crypto.spec.SecretKeySpec
-import java.util.Base64
 
 const val ONE_HOUR = 60 * 60 * 1000
 const val NO_SECRET = "noSecret"
@@ -20,55 +21,68 @@ class JwtUtil {
     @PostConstruct
     fun init(){
         println(
-            if (secret == NO_SECRET) "⚠\uFE0F JWT Secret Not Loaded !" else "\uD83D\uDD11 JWT Secret Loaded from env"
+            if (secretKey == NO_SECRET) "⚠\uFE0F JWT Secret Not Loaded !" else "\uD83D\uDD11 JWT Secret Loaded from env"
         )
     }
 
-    @Value("\${jwt.secret:noSecret}")
-    private lateinit var secret: String
+    @Value("\${jwt.secret}") // Charge la clé secrète depuis application.yml
+    private lateinit var secretKey: String
 
-    /*fun generateToken(userIdentifier: String): String {
-        val now = Date()
-        val expiration = Date(now.time + ONE_HOUR)
+    private fun getSignKey(): Key {
+        val keyBytes = Decoders.BASE64.decode(secretKey)
+        return Keys.hmacShaKeyFor(keyBytes)
+    }
 
-        return Jwts.builder()
-            .setSubject(userIdentifier)
-            .setIssuedAt(now)
-            .setExpiration(expiration)
-            .signWith(getSecretKey(), SignatureAlgorithm.HS256)
-            .compact()
-    }*/
-
-    fun generateToken(userDetails: UserDetails): String {
+    fun generateToken(userDetails: CustomUserDetails): String {
         return Jwts.builder()
             .setSubject(userDetails.username)
             .claim("roles", userDetails.authorities.map { it.authority })
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10h
-            .signWith(getSecretKey(), SignatureAlgorithm.HS256)
+            .signWith(getSignKey(), SignatureAlgorithm.HS256)
             .compact()
     }
 
-    fun validateToken(token: String, userDetails: UserDetails): Boolean {
-        val username = extractUsername(token)
-        return username == userDetails.username && !isTokenExpired(token)
-    }
 
-    fun extractUsername(token: String): String? {
-        return Jwts.parserBuilder().setSigningKey(getSecretKey()).build().parseClaimsJws(token).body.subject
-    }
 
-    private fun isTokenExpired(token: String): Boolean {
-        return getClaims(token).expiration.before(Date())
-    }
-
-    private fun getClaims(token: String): Claims {
+    /**
+     * Extrait tous les claims (données) du token JWT
+     */
+    fun extractAllClaims(token: String): Claims {
         return Jwts.parserBuilder()
-            .setSigningKey(getSecretKey())
+            .setSigningKey(getSignKey())
             .build()
             .parseClaimsJws(token)
             .body
     }
 
-    private fun getSecretKey() = SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA256")
+    /**
+     * Extrait une information spécifique des claims
+     */
+    fun <T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {
+        val claims = extractAllClaims(token)
+        return claimsResolver(claims)
+    }
+
+    /**
+     * Extrait le username (subject) du token
+     */
+    fun extractUsername(token: String): String {
+        return extractClaim(token) { it.subject }
+    }
+
+    /**
+     * Vérifie si le token est valide
+     */
+    fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
+        val username = extractUsername(token)
+        return username == userDetails.username && !isTokenExpired(token)
+    }
+
+    /**
+     * Vérifie si le token est expiré
+     */
+    fun isTokenExpired(token: String): Boolean {
+        return extractClaim(token) { it.expiration }.before(Date())
+    }
 }
