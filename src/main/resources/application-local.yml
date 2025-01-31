@@ -3,3 +3,5 @@ spring :
     name: auth-server
 server:
   port: 8090
+jwt:
+  secret: Xv1qj8+0Vd6k2ZGk7RkB0TzJ4GqWJXVy9DfV4bNvl6Y=

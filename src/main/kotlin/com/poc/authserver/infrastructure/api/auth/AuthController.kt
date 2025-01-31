@@ -14,7 +14,7 @@ class AuthController(
 ) {
 
     @PostMapping("/login")
-    fun loginWithCredentials(@RequestBody request: LoginRequest) : ResponseEntity<UserView> {
+    fun loginWithCredentials(@RequestBody request: LoginRequest) : ResponseEntity<AccessTokenResponse?> {
         return ResponseEntity.ok(authAdapter.login(request))
     }
 }
