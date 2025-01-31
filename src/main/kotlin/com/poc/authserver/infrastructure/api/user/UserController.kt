@@ -1,14 +1,13 @@
 package com.poc.authserver.infrastructure.api.user
 
+import com.poc.authserver.utils.AuthServerSecurityGuard
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
-class UserController(
-    private val userAdapter: UserAdapter
-) {
+class UserController(private val userAdapter: UserAdapter) {
 
     @GetMapping
     fun getUsers(): ResponseEntity<List<UserView>>{
@@ -26,12 +25,13 @@ class UserController(
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@authServerSecurityGuard.isSelfOrAdmin(#id)")
     fun updateUser(@PathVariable id: String, @RequestBody request: UserEditionRequest): ResponseEntity<UserView?>{
         return ResponseEntity.ok(userAdapter.update(id, request))
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authServerSecurityGuard.hasAdminRole()")
     fun deleteUser(@PathVariable id: String): ResponseEntity<String>{
         userAdapter.delete(id)
         return ResponseEntity.ok("User with id: $id has been deleted")
