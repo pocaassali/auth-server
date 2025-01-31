@@ -27,7 +27,9 @@ class UserAdapter(
     }
 
     fun update(id: String, request: UserEditionRequest): UserView? {
-        return userApplicationService.updateUser(request.toCommand(id))?.let { UserView.from(it) }
+        return userApplicationService.updateUser(
+            request.toCommand(id, passwordEncoder.encode(request.password))
+        )?.let { UserView.from(it) }
     }
 
     fun delete(id: String) {

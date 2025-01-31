@@ -7,17 +7,18 @@ import com.poc.authserver.core.domain.valueobject.UserRole
 import java.util.*
 
 class UpdateUserCommand(
-    val identifier : String,
+    private val identifier : String,
     val mail : String,
     val password : String,
-    val role : String,
+    val hashedPassword : String,
+    private val role : String,
 ) {
 
     fun toUser(): User {
         return User(
             identifier = UUID.fromString(identifier),
             mail = Mail(mail),
-            password = Password(password),
+            password = Password(hashedPassword),
             role = UserRole.valueOf(role),
         )
     }

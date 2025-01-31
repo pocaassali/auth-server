@@ -26,7 +26,13 @@ data class UserEditionRequest(
     val password : String,
     val role : String,
 ) {
-    fun toCommand(id: String) : UpdateUserCommand {
-        return UpdateUserCommand(id, mail, password ,role)
+    fun toCommand(id: String, encryptedPassword : String) : UpdateUserCommand {
+        return UpdateUserCommand(
+            identifier = id,
+            mail = mail,
+            password = password,
+            hashedPassword = encryptedPassword,
+            role = role
+        )
     }
 }
