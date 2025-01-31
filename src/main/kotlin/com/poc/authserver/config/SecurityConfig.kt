@@ -34,10 +34,13 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement {it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .authorizeHttpRequests {
-                it.requestMatchers("/svc/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/svc/auth/users/{id}").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/svc/auth/users/{id}").hasRole("ADMIN")
-                    .anyRequest().authenticated()
+                it.requestMatchers(*SecurityPermissions.PUBLIC_ENDPOINTS.toTypedArray()).permitAll()
+
+                SecurityPermissions.ADMIN_ENDPOINTS.forEach { (method, endpoints) ->
+                    it.requestMatchers(method, *endpoints.toTypedArray()).hasRole("ADMIN")
+                }
+
+                it.anyRequest().authenticated()
             }
             .exceptionHandling {
                 it.authenticationEntryPoint(CustomAuthenticationEntryPoint())
@@ -59,4 +62,13 @@ class SecurityConfig(
         authProvider.setPasswordEncoder(passwordEncoder())
         return authProvider
     }
+}
+
+object SecurityPermissions {
+    val PUBLIC_ENDPOINTS = listOf("/login")
+
+    val ADMIN_ENDPOINTS = mapOf(
+        HttpMethod.PUT to listOf("/users/{id}"),
+        HttpMethod.DELETE to listOf("/users/{id}")
+    )
 }
