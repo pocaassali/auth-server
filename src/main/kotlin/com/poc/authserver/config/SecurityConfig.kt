@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -18,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
     private val jwtFilter: JwtFilter,
     private val customUserDetailsService : CustomUserDetailsService
@@ -36,9 +38,9 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(*SecurityPermissions.PUBLIC_ENDPOINTS.toTypedArray()).permitAll()
 
-                SecurityPermissions.ADMIN_ENDPOINTS.forEach { (method, endpoints) ->
+                /*SecurityPermissions.ADMIN_ENDPOINTS.forEach { (method, endpoints) ->
                     it.requestMatchers(method, *endpoints.toTypedArray()).hasRole("ADMIN")
-                }
+                }*/
 
                 it.anyRequest().authenticated()
             }
@@ -69,6 +71,6 @@ object SecurityPermissions {
 
     val ADMIN_ENDPOINTS = mapOf(
         HttpMethod.PUT to listOf("/users/{id}"),
-        HttpMethod.DELETE to listOf("/users/{id}")
+        //HttpMethod.DELETE to listOf("/users/{id}")
     )
 }

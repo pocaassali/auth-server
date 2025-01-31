@@ -1,6 +1,7 @@
 package com.poc.authserver.infrastructure.api.user
 
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -30,6 +31,7 @@ class UserController(
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     fun deleteUser(@PathVariable id: String): ResponseEntity<String>{
         userAdapter.delete(id)
         return ResponseEntity.ok("User with id: $id has been deleted")
