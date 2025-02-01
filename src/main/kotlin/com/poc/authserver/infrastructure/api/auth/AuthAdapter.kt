@@ -25,6 +25,8 @@ class AuthAdapter(
                 val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
                 val accessToken = jwtUtil.generateToken(customUserDetails)
                 val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
+                //TODO : delete previous tokens for user
+                //TODO : save new refreshToken
                 return TokensResponse(accessToken, refreshToken)
             }
         }
