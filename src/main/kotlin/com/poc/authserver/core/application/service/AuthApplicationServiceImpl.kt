@@ -1,6 +1,7 @@
 package com.poc.authserver.core.application.service
 
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenCommand
+import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByTokenCommand
+import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByUserIdCommand
 import com.poc.authserver.core.application.dto.query.GetUserByCredentialsQuery
 import com.poc.authserver.core.application.dto.query.GetRefreshTokenByTokenQuery
 import com.poc.authserver.core.application.ports.input.AuthApplicationService
@@ -21,8 +22,12 @@ class AuthApplicationServiceImpl(
         return getRefreshTokenByToken.handle(query)
     }
 
-    override fun deleteToken(command: DeleteRefreshTokenCommand) {
-        TODO("Not yet implemented")
+    override fun deleteToken(command: DeleteRefreshTokenByTokenCommand) {
+        deleteRefreshToken.handle(command)
+    }
+
+    override fun deleteTokenForUser(command: DeleteRefreshTokenByUserIdCommand) {
+        deleteRefreshToken.handle(command)
     }
 
 }

@@ -6,6 +6,7 @@ import com.poc.authserver.core.domain.valueobject.Token
 import com.poc.authserver.infrastructure.persistence.entity.RefreshTokenEntity
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.util.*
 
 @Repository
 class InMemoryTokenRepository : Tokens {
@@ -25,6 +26,10 @@ class InMemoryTokenRepository : Tokens {
     override fun delete(token: Token) {
         val tokenToDelete = tokens.entries.find { it.value.token == token.value }
         tokenToDelete?.let { tokens.remove(it.key) }
+    }
+
+    override fun delete(userId: UUID) {
+        TODO("Not yet implemented")
     }
 
 }

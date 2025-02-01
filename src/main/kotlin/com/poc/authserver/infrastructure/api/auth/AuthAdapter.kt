@@ -1,6 +1,7 @@
 package com.poc.authserver.infrastructure.api.auth
 
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenCommand
+import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByTokenCommand
+import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByUserIdCommand
 import com.poc.authserver.core.application.dto.query.GetUserByIdQuery
 import com.poc.authserver.core.application.ports.input.AuthApplicationService
 import com.poc.authserver.core.application.ports.input.UserApplicationService
@@ -26,6 +27,7 @@ class AuthAdapter(
                 val accessToken = jwtUtil.generateToken(customUserDetails)
                 val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
                 //TODO : delete previous tokens for user
+                authApplicationService.deleteTokenForUser(DeleteRefreshTokenByUserIdCommand(user.identifier.toString()))
                 //TODO : save new refreshToken
                 return TokensResponse(accessToken, refreshToken)
             }
@@ -39,7 +41,7 @@ class AuthAdapter(
         println(storedToken)
         if (storedToken?.expirationDate?.isBefore(Instant.now()) == true) {
             println("expire")
-            authApplicationService.deleteToken(DeleteRefreshTokenCommand(storedToken.token.value)) //TODO : improve this
+            authApplicationService.deleteToken(DeleteRefreshTokenByTokenCommand(storedToken.token.value)) //TODO : improve this
         }
 
         val userFromToken = storedToken?.userIdentifier?.let { GetUserByIdQuery(id = it) }
