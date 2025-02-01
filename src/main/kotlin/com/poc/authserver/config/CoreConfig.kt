@@ -1,5 +1,6 @@
 package com.poc.authserver.config
 
+import com.poc.authserver.core.application.ports.output.Tokens
 import com.poc.authserver.core.application.ports.output.Users
 import com.poc.authserver.core.application.service.*
 import org.springframework.context.annotation.Bean
@@ -41,10 +42,20 @@ class CoreConfig {
     @Bean
     fun authApplicationService(
         getUserByCredentials: GetUserByCredentials,
+        getRefreshTokenByToken: GetRefreshTokenByToken,
+        deleteRefreshToken: DeleteRefreshToken
     ) = AuthApplicationServiceImpl(
-        getUserByCredentials = getUserByCredentials
+        getUserByCredentials = getUserByCredentials,
+        getRefreshTokenByToken = getRefreshTokenByToken,
+        deleteRefreshToken = deleteRefreshToken
     )
 
     @Bean
     fun getUserByCredentials(users: Users) = GetUserByCredentials(users)
+
+    @Bean
+    fun getToken(tokens: Tokens) = GetRefreshTokenByToken(tokens)
+
+    @Bean
+    fun deleteRefreshToken(tokens: Tokens) = DeleteRefreshToken(tokens)
 }

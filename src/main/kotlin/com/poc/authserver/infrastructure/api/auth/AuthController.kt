@@ -14,4 +14,9 @@ class AuthController(
     fun loginWithCredentials(@RequestBody request: LoginRequest) : ResponseEntity<TokensResponse?> {
         return ResponseEntity.ok(authAdapter.login(request))
     }
+
+    @PostMapping("/refresh")
+    fun refreshToken(@RequestBody request: RefreshTokenRequest): ResponseEntity<TokensResponse?> {
+        return ResponseEntity.ok(authAdapter.refreshToken(request)) //if adapter return null return 401 here
+    }
 }

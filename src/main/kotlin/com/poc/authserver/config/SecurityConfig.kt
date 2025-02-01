@@ -67,7 +67,7 @@ class SecurityConfig(
 }
 
 object SecurityPermissions {
-    val PUBLIC_ENDPOINTS = listOf("/login")
+    val PUBLIC_ENDPOINTS = listOf("/login", "/refresh")
 
     val ADMIN_ENDPOINTS = mapOf(
         HttpMethod.PUT to listOf("/users/{id}"),
