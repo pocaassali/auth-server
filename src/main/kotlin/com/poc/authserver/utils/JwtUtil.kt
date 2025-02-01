@@ -13,6 +13,7 @@ import java.security.Key
 import java.util.*
 
 const val ONE_HOUR = 60 * 60 * 1000
+const val ONE_WEEK = 7 * 24 * 60 * 60 * 1000
 const val NO_SECRET = "noSecret"
 
 @Component
@@ -25,7 +26,7 @@ class JwtUtil {
         )
     }
 
-    @Value("\${jwt.secret}") // Charge la clé secrète depuis application.yml
+    @Value("\${jwt.secret}")
     private lateinit var secretKey: String
 
     private fun getSignKey(): Key {
@@ -38,16 +39,20 @@ class JwtUtil {
             .setSubject(userDetails.username)
             .claim("roles", userDetails.authorities.map { it.authority })
             .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10h
+            .setExpiration(Date(System.currentTimeMillis() + ONE_HOUR))
             .signWith(getSignKey(), SignatureAlgorithm.HS256)
             .compact()
     }
 
+    fun generateRefreshToken(user: CustomUserDetails): String {
+        return Jwts.builder()
+            .setSubject(user.username)
+            .setIssuedAt(Date())
+            .setExpiration(Date(System.currentTimeMillis() + ONE_WEEK))
+            .signWith(getSignKey(), SignatureAlgorithm.HS256)
+            .compact()
+    }
 
-
-    /**
-     * Extrait tous les claims (données) du token JWT
-     */
     fun extractAllClaims(token: String): Claims {
         return Jwts.parserBuilder()
             .setSigningKey(getSignKey())
@@ -56,32 +61,20 @@ class JwtUtil {
             .body
     }
 
-    /**
-     * Extrait une information spécifique des claims
-     */
     fun <T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {
         val claims = extractAllClaims(token)
         return claimsResolver(claims)
     }
 
-    /**
-     * Extrait le username (subject) du token
-     */
     fun extractUsername(token: String): String {
         return extractClaim(token) { it.subject }
     }
 
-    /**
-     * Vérifie si le token est valide
-     */
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
         val username = extractUsername(token)
         return username == userDetails.username && !isTokenExpired(token)
     }
 
-    /**
-     * Vérifie si le token est expiré
-     */
     fun isTokenExpired(token: String): Boolean {
         return extractClaim(token) { it.expiration }.before(Date())
     }

@@ -13,13 +13,14 @@ class AuthAdapter(
     private val jwtUtil: JwtUtil,
     private val customUserDetailsService: CustomUserDetailsService,
 ) {
-    fun login(request: LoginRequest): AccessTokenResponse? {
+    fun login(request: LoginRequest): TokensResponse? {
         val user = authApplicationService.getUserByCredentials(request.toQuery())
         if (user != null) {
             if (passwordEncoder.matches(request.password,user.password.value)){
                 val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
-                val token = jwtUtil.generateToken(customUserDetails)
-                return AccessTokenResponse(token)
+                val accessToken = jwtUtil.generateToken(customUserDetails)
+                val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
+                return TokensResponse(accessToken, refreshToken)
             }
         }
         return null
