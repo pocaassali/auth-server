@@ -8,4 +8,5 @@ interface Tokens {
     fun findByToken(token: Token): RefreshToken?
     fun delete(token: Token)
     fun delete(userId: UUID)
+    fun save(refreshToken: RefreshToken) : RefreshToken?
 }

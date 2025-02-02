@@ -19,4 +19,6 @@ class AuthController(
     fun refreshToken(@RequestBody request: RefreshTokenRequest): ResponseEntity<TokensResponse?> {
         return ResponseEntity.ok(authAdapter.refreshToken(request)) //if adapter return null return 401 here
     }
+
+    //TODO LOGOUT
 }

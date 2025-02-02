@@ -43,11 +43,13 @@ class CoreConfig {
     fun authApplicationService(
         getUserByCredentials: GetUserByCredentials,
         getRefreshTokenByToken: GetRefreshTokenByToken,
-        deleteRefreshToken: DeleteRefreshToken
+        deleteRefreshToken: DeleteRefreshToken,
+        saveRefreshToken: SaveRefreshToken,
     ) = AuthApplicationServiceImpl(
         getUserByCredentials = getUserByCredentials,
         getRefreshTokenByToken = getRefreshTokenByToken,
-        deleteRefreshToken = deleteRefreshToken
+        deleteRefreshToken = deleteRefreshToken,
+        saveRefreshToken = saveRefreshToken
     )
 
     @Bean
@@ -58,4 +60,7 @@ class CoreConfig {
 
     @Bean
     fun deleteRefreshToken(tokens: Tokens) = DeleteRefreshToken(tokens)
+
+    @Bean
+    fun saveRefreshToken(tokens: Tokens) = SaveRefreshToken(tokens)
 }
