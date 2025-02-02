@@ -1,5 +1,6 @@
 package com.poc.authserver.config
 
+import com.poc.authserver.config.SecurityPermissions.PUBLIC_ENDPOINTS
 import com.poc.authserver.filter.JwtFilter
 import com.poc.authserver.utils.CustomAccessDeniedHandler
 import com.poc.authserver.utils.CustomAuthenticationEntryPoint
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
+
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
@@ -33,10 +35,11 @@ class SecurityConfig(
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
+            .logout { it.disable() }
             .csrf { it.disable() }
             .sessionManagement {it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .authorizeHttpRequests {
-                it.requestMatchers(*SecurityPermissions.PUBLIC_ENDPOINTS.toTypedArray()).permitAll()
+                it.requestMatchers(*PUBLIC_ENDPOINTS.toTypedArray()).permitAll()
 
                 /*SecurityPermissions.ADMIN_ENDPOINTS.forEach { (method, endpoints) ->
                     it.requestMatchers(method, *endpoints.toTypedArray()).hasRole("ADMIN")
@@ -67,7 +70,7 @@ class SecurityConfig(
 }
 
 object SecurityPermissions {
-    val PUBLIC_ENDPOINTS = listOf("/login", "/refresh")
+    val PUBLIC_ENDPOINTS = listOf("/login", "/refresh", "/logout")
 
     val ADMIN_ENDPOINTS = mapOf(
         HttpMethod.PUT to listOf("/users/{id}"),

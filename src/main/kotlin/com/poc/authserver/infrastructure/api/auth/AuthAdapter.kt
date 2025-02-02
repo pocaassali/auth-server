@@ -63,4 +63,8 @@ class AuthAdapter(
 
         return null
     }
+
+    fun logout(request: LogoutRequest) {
+        authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
+    }
 }

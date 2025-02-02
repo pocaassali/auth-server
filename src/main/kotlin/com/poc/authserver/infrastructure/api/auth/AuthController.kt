@@ -20,5 +20,9 @@ class AuthController(
         return ResponseEntity.ok(authAdapter.refreshToken(request)) //if adapter return null return 401 here
     }
 
-    //TODO LOGOUT
+    @PostMapping("/logout")
+    fun logout(@RequestBody request : LogoutRequest) : ResponseEntity<String> {
+        authAdapter.logout(request)
+        return ResponseEntity.ok("User with id ${request.userId} successfully logged out")
+    }
 }

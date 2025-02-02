@@ -15,3 +15,5 @@ data class RefreshTokenRequest(val refreshToken: String){
         return GetRefreshTokenByTokenQuery(refreshToken)
     }
 }
+
+data class LogoutRequest(val userId: String, val refreshToken: String = ""){}
