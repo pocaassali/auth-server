@@ -26,7 +26,7 @@ class JwtSessionFilter(
         val sessionId = request.getHeader("SESSION_ID")
 
         if (!sessionId.isNullOrBlank()) {
-            val jwt = jwtSessionService.getJwt(sessionId)
+            val jwt = jwtSessionService.getAccessToken(sessionId)
             val username = jwt?.let { jwtUtil.extractUsername(it) }
             val customUserDetails = username?.let { customUserDetailsService.loadUserByUsername(it) }
 

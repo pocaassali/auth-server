@@ -21,9 +21,15 @@ class AuthController(
         return ResponseEntity.ok(authAdapter.loginSessionBased(request))
     }
 
-    @PostMapping("/refresh")
+    /*@PostMapping("/refresh")
     fun refreshToken(@RequestBody request: RefreshTokenRequest): ResponseEntity<TokensResponse?> {
         return ResponseEntity.ok(authAdapter.refreshToken(request)) //if adapter return null return 401 here
+    }*/
+
+    @PostMapping("/refresh")
+    fun refreshToken(@RequestHeader("SESSION_ID") sessionId : String): ResponseEntity<Unit> {
+        authAdapter.refreshTokenSessionBased(sessionId)
+        return ResponseEntity.ok().build()
     }
 
     /*@PostMapping("/logout")

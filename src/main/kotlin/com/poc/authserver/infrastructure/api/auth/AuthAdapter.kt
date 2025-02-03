@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Component
 class AuthAdapter(
@@ -23,7 +24,7 @@ class AuthAdapter(
     private val userApplicationService: UserApplicationService,
     private val jwtSessionService: JwtSessionService
 ) {
-    fun login(request: LoginRequest): TokensResponse? {
+    /*fun login(request: LoginRequest): TokensResponse? {
         val user = authApplicationService.getUserByCredentials(request.toQuery())
         if (user != null) {
             if (passwordEncoder.matches(request.password, user.password.value)) {
@@ -41,7 +42,7 @@ class AuthAdapter(
             }
         }
         return null
-    }
+    }*/
 
     fun loginSessionBased(request: LoginRequest): LoginResponse? {
         val user = authApplicationService.getUserByCredentials(request.toQuery())
@@ -49,10 +50,12 @@ class AuthAdapter(
             if (passwordEncoder.matches(request.password, user.password.value)) {
                 val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
                 val accessToken = jwtUtil.generateToken(customUserDetails)
-                //val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
+                val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
                 val sessionId = UUID.randomUUID().toString()
 
-                jwtSessionService.storeJwt(sessionId, accessToken, 3600000)
+                //jwtSessionService.storeAccessToken(sessionId, accessToken)
+                jwtSessionService.storeAccessToken(sessionId, accessToken)
+                jwtSessionService.storeRefreshToken(sessionId, refreshToken)
 
                 return LoginResponse(sessionId)
             }
@@ -60,7 +63,7 @@ class AuthAdapter(
         return null
     }
 
-    fun refreshToken(request: RefreshTokenRequest): TokensResponse? {
+    /*fun refreshToken(request: RefreshTokenRequest): TokensResponse? {
         val storedToken = authApplicationService.getToken(request.toQuery())
 
         println("STORED TOKEN $storedToken")
@@ -82,13 +85,39 @@ class AuthAdapter(
         }
 
         return null
+    }*/
+
+    fun refreshTokenSessionBased(sessionId: String) {
+        //val storedToken = authApplicationService.getToken(request.toQuery())
+        val storedToken = jwtSessionService.getRefreshToken(sessionId)
+
+        println("STORED TOKEN $storedToken")
+        if (storedToken?.let { jwtUtil.isTokenExpired(it) } == true) {
+            println("expire")
+            //authApplicationService.deleteToken(DeleteRefreshTokenByTokenCommand(storedToken.token.value))
+            jwtSessionService.deleteTokens(sessionId)
+        }
+        else {
+            /*val userFromToken = storedToken?.userIdentifier?.let { GetUserByIdQuery(id = it) }
+                ?.let { userApplicationService.getUserById(it) }*/
+            val userFromToken = storedToken?.let { jwtUtil.extractUsername(it) }
+                ?.let { userApplicationService.getUserById(GetUserByIdQuery(id = UUID.fromString(it))) }
+
+
+            if (userFromToken != null) {
+                val customUserDetails = customUserDetailsService.loadUserByUsername(userFromToken.identifier.toString())
+                val accessToken = jwtUtil.generateToken(customUserDetails)
+
+                jwtSessionService.storeAccessToken(sessionId, accessToken)
+            }
+        }
     }
 
-    fun logout(request: LogoutRequest) {
+    /*fun logout(request: LogoutRequest) {
         //authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
-    }
+    }*/
 
     fun logoutSessionBased(sessionId: String) {
-        jwtSessionService.invalidateSession(sessionId)
+        jwtSessionService.deleteTokens(sessionId)
     }
 }
