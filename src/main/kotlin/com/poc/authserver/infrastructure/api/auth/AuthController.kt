@@ -10,9 +10,14 @@ class AuthController(
     private val authAdapter: AuthAdapter
 ) {
 
-    @PostMapping("/login")
+    /*@PostMapping("/login")
     fun loginWithCredentials(@RequestBody request: LoginRequest) : ResponseEntity<TokensResponse?> {
         return ResponseEntity.ok(authAdapter.login(request))
+    }*/
+
+    @PostMapping("/login")
+    fun loginWithSession(@RequestBody request: LoginRequest) : ResponseEntity<LoginResponse?> {
+        return ResponseEntity.ok(authAdapter.loginSessionBased(request))
     }
 
     @PostMapping("/refresh")

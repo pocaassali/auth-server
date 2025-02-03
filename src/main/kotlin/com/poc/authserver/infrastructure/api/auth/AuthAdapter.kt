@@ -7,10 +7,12 @@ import com.poc.authserver.core.application.dto.query.GetUserByIdQuery
 import com.poc.authserver.core.application.ports.input.AuthApplicationService
 import com.poc.authserver.core.application.ports.input.UserApplicationService
 import com.poc.authserver.utils.CustomUserDetailsService
+import com.poc.authserver.utils.JwtSessionService
 import com.poc.authserver.utils.JwtUtil
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.time.Instant
+import java.util.*
 
 @Component
 class AuthAdapter(
@@ -19,6 +21,7 @@ class AuthAdapter(
     private val jwtUtil: JwtUtil,
     private val customUserDetailsService: CustomUserDetailsService,
     private val userApplicationService: UserApplicationService,
+    private val jwtSessionService: JwtSessionService
 ) {
     fun login(request: LoginRequest): TokensResponse? {
         val user = authApplicationService.getUserByCredentials(request.toQuery())
@@ -35,6 +38,23 @@ class AuthAdapter(
                 )
                 val storedRefreshToken = authApplicationService.saveRefreshToken(command)
                 return TokensResponse(accessToken, storedRefreshToken?.token?.value ?: "")
+            }
+        }
+        return null
+    }
+
+    fun loginSessionBased(request: LoginRequest): LoginResponse? {
+        val user = authApplicationService.getUserByCredentials(request.toQuery())
+        if (user != null) {
+            if (passwordEncoder.matches(request.password, user.password.value)) {
+                val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
+                val accessToken = jwtUtil.generateToken(customUserDetails)
+                //val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
+                val sessionId = UUID.randomUUID().toString()
+
+                jwtSessionService.storeJwt(sessionId, accessToken, 3600000)
+
+                return LoginResponse(sessionId)
             }
         }
         return null
