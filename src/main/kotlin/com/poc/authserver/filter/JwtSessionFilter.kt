@@ -23,10 +23,21 @@ class JwtSessionFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val sessionId = request.getHeader("SESSION_ID")
+        val authHeader = request.getHeader("Authorization")
 
-        if (!sessionId.isNullOrBlank()) {
+        if (authHeader == null || !authHeader.startsWith("Session ")) {
+            println("🔴 Aucun header trouvé ou format incorrect")
+            filterChain.doFilter(request, response)
+            return
+        }
+
+        val sessionId = authHeader.substring(8)
+
+        println(sessionId)
+
+        if (sessionId.isNotBlank()) {
             val jwt = jwtSessionService.getAccessToken(sessionId)
+            println(jwt)
             val username = jwt?.let { jwtUtil.extractUsername(it) }
             val customUserDetails = username?.let { customUserDetailsService.loadUserByUsername(it) }
 
