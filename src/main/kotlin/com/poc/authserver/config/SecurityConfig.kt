@@ -1,7 +1,7 @@
 package com.poc.authserver.config
 
 import com.poc.authserver.config.SecurityPermissions.PUBLIC_ENDPOINTS
-import com.poc.authserver.filter.JwtFilter
+import com.poc.authserver.filter.JwtSessionFilter
 import com.poc.authserver.utils.CustomAccessDeniedHandler
 import com.poc.authserver.utils.CustomAuthenticationEntryPoint
 import com.poc.authserver.utils.CustomUserDetailsService
@@ -23,7 +23,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
-    private val jwtFilter: JwtFilter,
+    //private val jwtFilter: JwtFilter,
+    private val jwtSessionFilter: JwtSessionFilter,
     private val customUserDetailsService : CustomUserDetailsService
 ) {
 
@@ -51,7 +52,8 @@ class SecurityConfig(
                 it.authenticationEntryPoint(CustomAuthenticationEntryPoint())
                 it.accessDeniedHandler(CustomAccessDeniedHandler())
             }
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+            //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(jwtSessionFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }

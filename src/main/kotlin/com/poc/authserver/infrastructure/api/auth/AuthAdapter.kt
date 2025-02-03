@@ -85,6 +85,10 @@ class AuthAdapter(
     }
 
     fun logout(request: LogoutRequest) {
-        authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
+        //authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
+    }
+
+    fun logoutSessionBased(sessionId: String) {
+        jwtSessionService.invalidateSession(sessionId)
     }
 }
