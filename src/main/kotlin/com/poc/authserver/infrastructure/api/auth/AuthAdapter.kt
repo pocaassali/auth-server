@@ -1,8 +1,5 @@
 package com.poc.authserver.infrastructure.api.auth
 
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByTokenCommand
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByUserIdCommand
-import com.poc.authserver.core.application.dto.command.SaveRefreshTokenCommand
 import com.poc.authserver.core.application.dto.query.GetUserByIdQuery
 import com.poc.authserver.core.application.ports.input.AuthApplicationService
 import com.poc.authserver.core.application.ports.input.UserApplicationService
@@ -11,9 +8,7 @@ import com.poc.authserver.utils.JwtSessionService
 import com.poc.authserver.utils.JwtUtil
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
-import java.time.Instant
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @Component
 class AuthAdapter(
@@ -51,13 +46,13 @@ class AuthAdapter(
                 val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
                 val accessToken = jwtUtil.generateToken(customUserDetails)
                 val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
-                val sessionId = UUID.randomUUID().toString()
+                //val sessionId = UUID.randomUUID().toString()
 
                 //jwtSessionService.storeAccessToken(sessionId, accessToken)
-                jwtSessionService.storeAccessToken(sessionId, accessToken)
-                jwtSessionService.storeRefreshToken(sessionId, refreshToken)
+                jwtSessionService.storeAccessToken(user.identifier.toString(), accessToken)
+                jwtSessionService.storeRefreshToken(user.identifier.toString(), refreshToken)
 
-                return LoginResponse(sessionId)
+                return LoginResponse(user.identifier.toString())
             }
         }
         return null
@@ -96,6 +91,7 @@ class AuthAdapter(
             println("expire")
             //authApplicationService.deleteToken(DeleteRefreshTokenByTokenCommand(storedToken.token.value))
             jwtSessionService.deleteTokens(sessionId)
+            //TODO : not 200 response
         }
         else {
             /*val userFromToken = storedToken?.userIdentifier?.let { GetUserByIdQuery(id = it) }
@@ -117,7 +113,7 @@ class AuthAdapter(
         //authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
     }*/
 
-    fun logoutSessionBased(sessionId: String) {
-        jwtSessionService.deleteTokens(sessionId)
+    fun logoutSessionBased(userId: String) {
+        jwtSessionService.deleteTokens(userId)
     }
 }

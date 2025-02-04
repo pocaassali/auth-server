@@ -16,38 +16,38 @@ class JwtSessionService(private val redisTemplate: StringRedisTemplate) {
      * For 1 hour by default
      * */
     fun storeAccessToken(
-        sessionId: String,
+        userId: String,
         token: String,
         expiration: Long = DEFAULT_ACCESS_TOKEN_EXPIRATION,
         timeUnit: TimeUnit = TimeUnit.HOURS
-    ) = redisTemplate.opsForValue().set("$ACCESS_TOKEN_SESSION_KEY:$sessionId", token, expiration, timeUnit)
+    ) = redisTemplate.opsForValue().set("$ACCESS_TOKEN_SESSION_KEY:$userId", token, expiration, timeUnit)
 
 
     /**
      * For 1 week by default
      * */
     fun storeRefreshToken(
-        sessionId: String,
+        userId: String,
         token: String,
         expiration: Long = DEFAULT_REFRESH_TOKEN_EXPIRATION,
         timeUnit: TimeUnit = TimeUnit.DAYS
-    ) = redisTemplate.opsForValue().set("$REFRESH_TOKEN_SESSION_KEY:$sessionId", token, expiration, timeUnit)
+    ) = redisTemplate.opsForValue().set("$REFRESH_TOKEN_SESSION_KEY:$userId", token, expiration, timeUnit)
 
 
-    fun getAccessToken(sessionId: String): String? {
-        return redisTemplate.opsForValue().get("$ACCESS_TOKEN_SESSION_KEY:$sessionId")
+    fun getAccessToken(userId: String): String? {
+        return redisTemplate.opsForValue().get("$ACCESS_TOKEN_SESSION_KEY:$userId")
     }
 
-    fun getRefreshToken(sessionId: String): String? {
-        return redisTemplate.opsForValue().get("$REFRESH_TOKEN_SESSION_KEY:$sessionId")
+    fun getRefreshToken(userId: String): String? {
+        return redisTemplate.opsForValue().get("$REFRESH_TOKEN_SESSION_KEY:$userId")
     }
 
     /*fun invalidateSession(sessionId: String) {
         redisTemplate.delete("session:$sessionId")
     }*/
 
-    fun deleteTokens(sessionId: String) {
-        redisTemplate.delete("$ACCESS_TOKEN_SESSION_KEY:$sessionId")
-        redisTemplate.delete("$REFRESH_TOKEN_SESSION_KEY:$sessionId")
+    fun deleteTokens(userId: String) {
+        redisTemplate.delete("$ACCESS_TOKEN_SESSION_KEY:$userId")
+        redisTemplate.delete("$REFRESH_TOKEN_SESSION_KEY:$userId")
     }
 }

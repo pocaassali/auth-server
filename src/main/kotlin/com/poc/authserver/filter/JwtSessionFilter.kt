@@ -11,6 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
+const val HEADER_AUTHORIZATION = "Authorization"
+const val HEADER_AUTHORIZATION_PREFIX = "User "
+
 @Component
 class JwtSessionFilter(
     private val jwtUtil: JwtUtil,
@@ -23,30 +26,28 @@ class JwtSessionFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val authHeader = request.getHeader("Authorization")
+        val authHeader = request.getHeader(HEADER_AUTHORIZATION)
 
-        if (authHeader == null || !authHeader.startsWith("Session ")) {
+        if (authHeader == null || !authHeader.startsWith(HEADER_AUTHORIZATION_PREFIX)) {
             println("🔴 Aucun header trouvé ou format incorrect")
             filterChain.doFilter(request, response)
             return
         }
 
-        val sessionId = authHeader.substring(8)
+        val userId = authHeader.substring(HEADER_AUTHORIZATION_PREFIX.length)
 
-        println(sessionId)
+        println(userId)
 
-        if (sessionId.isNotBlank()) {
-            val jwt = jwtSessionService.getAccessToken(sessionId)
+        if (userId.isNotBlank()) {
+            val jwt = jwtSessionService.getAccessToken(userId)
             println(jwt)
             val username = jwt?.let { jwtUtil.extractUsername(it) }
-            val customUserDetails = username?.let { customUserDetailsService.loadUserByUsername(it) }
+            val customUserDetails = username?.let { customUserDetailsService.loadUserByUsername(userId) }
 
             if (!jwt.isNullOrBlank() && customUserDetails?.let { jwtUtil.isTokenValid(jwt, it) } == true) {
 
-                val userDetails = customUserDetailsService.loadUserByUsername(username)
-
                 val authToken = UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.authorities
+                    customUserDetails, null, customUserDetails.authorities
                 )
                 SecurityContextHolder.getContext().authentication = authToken
             }

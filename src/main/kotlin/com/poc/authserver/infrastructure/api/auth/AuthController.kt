@@ -27,8 +27,8 @@ class AuthController(
     }*/
 
     @PostMapping("/refresh")
-    fun refreshToken(@RequestHeader("SESSION_ID") sessionId : String): ResponseEntity<Unit> {
-        authAdapter.refreshTokenSessionBased(sessionId)
+    fun refreshToken(@RequestHeader("USER_ID") userId : String): ResponseEntity<Unit> {
+        authAdapter.refreshTokenSessionBased(userId)
         return ResponseEntity.ok().build()
     }
 
@@ -39,8 +39,8 @@ class AuthController(
     }*/
 
     @PostMapping("/logout")
-    fun logout(@RequestHeader("SESSION_ID") sessionId : String) : ResponseEntity<String> {
-        authAdapter.logoutSessionBased(sessionId)
-        return ResponseEntity.ok("Session with id $sessionId successfully revoked")
+    fun logout(@RequestHeader("USER_ID") userId : String) : ResponseEntity<String> {
+        authAdapter.logoutSessionBased(userId)
+        return ResponseEntity.ok("Session with id $userId successfully revoked")
     }
 }
