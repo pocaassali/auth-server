@@ -26,19 +26,36 @@ class JwtSessionFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val authHeader = request.getHeader(HEADER_AUTHORIZATION)
+        /*val authHeader = request.getHeader(HEADER_AUTHORIZATION)
 
         if (authHeader == null || !authHeader.startsWith(HEADER_AUTHORIZATION_PREFIX)) {
             println("🔴 Aucun header trouvé ou format incorrect")
             filterChain.doFilter(request, response)
             return
+        }*/
+
+        val sessionId = request.cookies?.firstOrNull { it.name == "SESSION_ID" }?.value
+
+        println(sessionId)
+
+        if (sessionId != null) {
+            val session = jwtSessionService.getSession(sessionId)
+            if (session != null && !jwtUtil.isTokenExpired(session.accessToken)) {
+                println(session.accessToken)
+                val username = jwtUtil.extractUsername(session.accessToken)
+                val customUserDetails = customUserDetailsService.loadUserByUsername(username)
+
+                if (session.accessToken.isNotBlank() && customUserDetails.let { jwtUtil.isTokenValid(session.accessToken, it) }) {
+
+                    val authToken = UsernamePasswordAuthenticationToken(
+                        customUserDetails, null, customUserDetails.authorities
+                    )
+                    SecurityContextHolder.getContext().authentication = authToken
+                }
+            }
+
         }
-
-        val userId = authHeader.substring(HEADER_AUTHORIZATION_PREFIX.length)
-
-        println(userId)
-
-        if (userId.isNotBlank()) {
+        /*if (userId.isNotBlank()) {
             val jwt = jwtSessionService.getAccessToken(userId)
             println(jwt)
             val username = jwt?.let { jwtUtil.extractUsername(it) }
@@ -53,6 +70,7 @@ class JwtSessionFilter(
             }
         }
 
+        filterChain.doFilter(request, response)*/
         filterChain.doFilter(request, response)
     }
 

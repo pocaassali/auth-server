@@ -2,6 +2,7 @@ package com.poc.authserver.utils
 
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 const val ACCESS_TOKEN_SESSION_KEY = "ACCESS_TOKEN"
@@ -50,4 +51,28 @@ class JwtSessionService(private val redisTemplate: StringRedisTemplate) {
         redisTemplate.delete("$ACCESS_TOKEN_SESSION_KEY:$userId")
         redisTemplate.delete("$REFRESH_TOKEN_SESSION_KEY:$userId")
     }
+
+    fun storeSession(sessionId: String, accessToken: String, refreshToken: String) {
+        val sessionData = mapOf(
+            "accessToken" to accessToken,
+            "refreshToken" to refreshToken
+        )
+        redisTemplate.opsForHash<String, String>().putAll(sessionId, sessionData)
+        redisTemplate.expire(sessionId, Duration.ofDays(7))
+    }
+
+    fun removeSession(sessionId: String) {
+        redisTemplate.delete(sessionId)
+    }
+
+    fun getSession(sessionId: String): SessionData? {
+        val sessionData = redisTemplate.opsForHash<String, String>().entries(sessionId)
+        return if (sessionData.isNotEmpty()) {
+            SessionData(sessionData["accessToken"] ?: "", sessionData["refreshToken"] ?: "")
+        } else {
+            null
+        }
+    }
 }
+
+data class SessionData(val accessToken: String, val refreshToken: String)

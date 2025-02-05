@@ -39,7 +39,7 @@ class AuthAdapter(
         return null
     }*/
 
-    fun loginSessionBased(request: LoginRequest): LoginResponse? {
+    /*fun loginSessionBased(request: LoginRequest): LoginResponse? {
         val user = authApplicationService.getUserByCredentials(request.toQuery())
         if (user != null) {
             if (passwordEncoder.matches(request.password, user.password.value)) {
@@ -55,6 +55,30 @@ class AuthAdapter(
                 return LoginResponse(user.identifier.toString())
             }
         }
+        return null
+    }*/
+
+    fun loginSessionBased(request: LoginRequest): LoginResponse? {
+        println(request)
+        val user = authApplicationService.getUserByCredentials(request.toQuery())
+        if (user != null) {
+            if (passwordEncoder.matches(request.password, user.password.value)) {
+                println("generate session")
+                val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
+                val accessToken = jwtUtil.generateToken(customUserDetails)
+                val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
+                val sessionId = UUID.randomUUID().toString()
+
+                //jwtSessionService.storeAccessToken(sessionId, accessToken)
+                //jwtSessionService.storeAccessToken(sessionId, accessToken)
+                //jwtSessionService.storeRefreshToken(sessionId, refreshToken)
+
+                jwtSessionService.storeSession(sessionId, accessToken, refreshToken)
+
+                return LoginResponse(sessionId)
+            }
+        }
+        println("No session create")
         return null
     }
 
@@ -82,7 +106,7 @@ class AuthAdapter(
         return null
     }*/
 
-    fun refreshTokenSessionBased(sessionId: String) {
+    /*fun refreshTokenSessionBased(sessionId: String) {
         //val storedToken = authApplicationService.getToken(request.toQuery())
         val storedToken = jwtSessionService.getRefreshToken(sessionId)
 
@@ -94,8 +118,8 @@ class AuthAdapter(
             //TODO : not 200 response
         }
         else {
-            /*val userFromToken = storedToken?.userIdentifier?.let { GetUserByIdQuery(id = it) }
-                ?.let { userApplicationService.getUserById(it) }*/
+            *//*val userFromToken = storedToken?.userIdentifier?.let { GetUserByIdQuery(id = it) }
+                ?.let { userApplicationService.getUserById(it) }*//*
             val userFromToken = storedToken?.let { jwtUtil.extractUsername(it) }
                 ?.let { userApplicationService.getUserById(GetUserByIdQuery(id = UUID.fromString(it))) }
 
@@ -107,13 +131,38 @@ class AuthAdapter(
                 jwtSessionService.storeAccessToken(sessionId, accessToken)
             }
         }
+    }*/
+
+    fun refreshTokenSessionBased(sessionId: String) {
+        val sessionData = jwtSessionService.getSession(sessionId) ?: return
+
+        println("SESSION DATA $sessionData")
+
+        val refreshToken = sessionData.accessToken
+        if (jwtUtil.isTokenExpired(refreshToken)) {
+            println("expire")
+            jwtSessionService.removeSession(sessionId)
+        }
+        else {
+            val userFromToken = userApplicationService
+                .getUserById(GetUserByIdQuery(UUID.fromString(jwtUtil.extractUsername(refreshToken))))
+
+
+            if (userFromToken != null) {
+                val customUserDetails = customUserDetailsService.loadUserByUsername(userFromToken.identifier.toString())
+                println("OLD TOKEN : ${sessionData.accessToken}")
+                val accessToken = jwtUtil.generateToken(customUserDetails)
+                jwtSessionService.storeSession(sessionId, accessToken, refreshToken)
+                println("NEW TOKEN : ${jwtSessionService.getSession(sessionId)!!.accessToken}")
+            }
+        }
     }
 
     /*fun logout(request: LogoutRequest) {
         //authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
     }*/
 
-    fun logoutSessionBased(userId: String) {
-        jwtSessionService.deleteTokens(userId)
+    fun logoutSessionBased(sessionId: String) {
+        jwtSessionService.removeSession(sessionId)
     }
 }
