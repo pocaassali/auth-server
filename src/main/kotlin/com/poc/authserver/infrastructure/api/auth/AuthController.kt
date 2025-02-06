@@ -3,6 +3,7 @@ package com.poc.authserver.infrastructure.api.auth
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -23,9 +24,13 @@ class AuthController(
 
     @PostMapping("/login")
     fun loginWithSessionCookie(
-        @RequestBody request: LoginRequest,
+        /*@RequestParam username: String,
+        @RequestParam password: String,*/
+        @ModelAttribute request: LoginRequest,
         response: HttpServletResponse
     ): ResponseEntity<String> {
+        //val request = LoginRequest(username, password)
+        println(request)
         val sessionId = authAdapter.loginSessionBased(request)?.sessionId
         if (sessionId != null) {
             val cookie = Cookie("SESSION_ID", sessionId).apply {

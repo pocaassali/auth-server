@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
-@Component
+/*@Component
 class JwtFilter(private val jwtUtil: JwtUtil, private val customUserDetailsService: CustomUserDetailsService) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -53,4 +53,4 @@ class JwtFilter(private val jwtUtil: JwtUtil, private val customUserDetailsServi
 
         filterChain.doFilter(request, response)
     }
-}
+}*/

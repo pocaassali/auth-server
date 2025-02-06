@@ -59,9 +59,9 @@ class AuthAdapter(
     }*/
 
     fun loginSessionBased(request: LoginRequest): LoginResponse? {
-        println(request)
         val user = authApplicationService.getUserByCredentials(request.toQuery())
         if (user != null) {
+            //TODO: if user already log in other session refresh all tokens
             if (passwordEncoder.matches(request.password, user.password.value)) {
                 println("generate session")
                 val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())

@@ -4,9 +4,9 @@ import com.poc.authserver.core.application.dto.query.GetUserByCredentialsQuery
 import com.poc.authserver.core.application.dto.query.GetRefreshTokenByTokenQuery
 
 
-data class LoginRequest(val mail: String, val password: String){
+data class LoginRequest(val username: String, val password: String){
     fun toQuery() : GetUserByCredentialsQuery {
-        return GetUserByCredentialsQuery(mail, password)
+        return GetUserByCredentialsQuery(username, password)
     }
 }
 

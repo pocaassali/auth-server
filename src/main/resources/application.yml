@@ -11,3 +11,7 @@ server:
     context-path: /svc/auth
 jwt:
   secret: ${JWT_SECRET:noSecret}
+
+logging:
+  level:
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR

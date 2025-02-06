@@ -23,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
-    //private val jwtFilter: JwtFilter,
     private val jwtSessionFilter: JwtSessionFilter,
     private val customUserDetailsService : CustomUserDetailsService
 ) {
@@ -40,20 +39,17 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement {it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .authorizeHttpRequests {
-                it.requestMatchers(*PUBLIC_ENDPOINTS.toTypedArray()).permitAll()
-
-                /*SecurityPermissions.ADMIN_ENDPOINTS.forEach { (method, endpoints) ->
-                    it.requestMatchers(method, *endpoints.toTypedArray()).hasRole("ADMIN")
-                }*/
-
-                it.anyRequest().authenticated()
+                it.requestMatchers(*PUBLIC_ENDPOINTS.toTypedArray())
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
             }
             .exceptionHandling {
                 it.authenticationEntryPoint(CustomAuthenticationEntryPoint())
                 it.accessDeniedHandler(CustomAccessDeniedHandler())
             }
-            //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
             .addFilterBefore(jwtSessionFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .formLogin { it.disable() }
 
         return http.build()
     }
@@ -72,7 +68,18 @@ class SecurityConfig(
 }
 
 object SecurityPermissions {
-    val PUBLIC_ENDPOINTS = listOf("/login", "/refresh", "/logout")
+    val PUBLIC_ENDPOINTS = listOf(
+        "/login",
+        "/refresh",
+        "/logout",
+        "/signup",
+        "/static/**",
+        "/css/**",
+        "/js/**",
+        "/images/**",
+        "/favicon.ico"
+    )
+
 
     val ADMIN_ENDPOINTS = mapOf(
         HttpMethod.PUT to listOf("/users/{id}"),
