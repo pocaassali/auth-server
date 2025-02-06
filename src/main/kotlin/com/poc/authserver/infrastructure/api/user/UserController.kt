@@ -1,5 +1,6 @@
 package com.poc.authserver.infrastructure.api.user
 
+import com.poc.authserver.infrastructure.api.auth.LoginRequest
 import com.poc.authserver.utils.AuthServerSecurityGuard
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -19,8 +20,11 @@ class UserController(private val userAdapter: UserAdapter) {
         return ResponseEntity.ok(userAdapter.getUserById(id))
     }
 
+    //TODO : move this controller as register AuthController
     @PostMapping
-    fun createUser(@RequestBody request: UserCreationRequest): ResponseEntity<UserView>{
+    fun createUser(/*@RequestBody request: UserCreationRequest*/@ModelAttribute request: UserCreationRequest): ResponseEntity<UserView>{
+        println(request)
+        //TODO : Probably should return template register-confirmation
         return ResponseEntity.ok(userAdapter.create(request))
     }
 

@@ -9,13 +9,13 @@
 </head>
 <body>
 <div class="form-container">
-    <form th:action="@{/auth/initiate-signup}" method="post">
+    <form th:action="@{/users}" method="post">
         <p>Nutripedia - Sign up Page</p>
         <p>
             <input type="text" name="username" class="form-control" placeholder="Username" required />
         </p>
         <p>
-            <input type="email" name="email" class="form-control" placeholder="Email" required />
+            <input type="email" name="mail" class="form-control" placeholder="Email" required />
         </p>
         <p>
             <input type="password" name="password" class="form-control" placeholder="Password" required />

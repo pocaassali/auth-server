@@ -4,11 +4,12 @@ import com.poc.authserver.core.application.dto.command.CreateUserCommand
 import com.poc.authserver.core.application.dto.command.UpdateUserCommand
 
 
+//TODO: improve request by removing identifier and role may be add username latter for now only mail and password are required
 data class UserCreationRequest(
-    val identifier : String,
+    val identifier : String = "3d41a343-3c56-4462-9f80-97b5eabb82fa",
     val mail : String,
     val password : String,
-    val role : String,
+    val role : String = "USER",
 ) {
     fun toCommand(encryptedPassword : String) : CreateUserCommand {
         return CreateUserCommand(

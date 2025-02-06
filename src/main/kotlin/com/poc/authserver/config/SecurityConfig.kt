@@ -77,7 +77,8 @@ object SecurityPermissions {
         "/css/**",
         "/js/**",
         "/images/**",
-        "/favicon.ico"
+        "/favicon.ico",
+        "/users" //TODO rename to register
     )
 
 
