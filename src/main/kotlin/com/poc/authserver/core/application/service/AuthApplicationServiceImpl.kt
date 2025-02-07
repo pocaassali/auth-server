@@ -1,7 +1,5 @@
 package com.poc.authserver.core.application.service
 
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByTokenCommand
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByUserIdCommand
 import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenCommand
 import com.poc.authserver.core.application.dto.command.SaveRefreshTokenCommand
 import com.poc.authserver.core.application.dto.query.GetUserByCredentialsQuery
@@ -32,13 +30,5 @@ class AuthApplicationServiceImpl(
     override fun saveRefreshToken(command: SaveRefreshTokenCommand) : RefreshToken? {
         return saveRefreshToken.handle(command)
     }
-
-    /*override fun deleteToken(command: DeleteRefreshTokenByTokenCommand) {
-        deleteRefreshToken.handle(command)
-    }
-
-    override fun deleteTokenForUser(command: DeleteRefreshTokenByUserIdCommand) {
-        deleteRefreshToken.handle(command)
-    }*/
 
 }

@@ -7,7 +7,6 @@ import com.poc.authserver.utils.CustomAuthenticationEntryPoint
 import com.poc.authserver.utils.CustomUserDetailsService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
@@ -79,11 +78,5 @@ object SecurityPermissions {
         "/images/**",
         "/favicon.ico",
         "/users" //TODO rename to register
-    )
-
-
-    val ADMIN_ENDPOINTS = mapOf(
-        HttpMethod.PUT to listOf("/users/{id}"),
-        //HttpMethod.DELETE to listOf("/users/{id}")
     )
 }

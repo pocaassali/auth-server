@@ -16,6 +16,7 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
         authException: AuthenticationException
     ) {
         println("🔴 CustomAuthenticationEntryPoint déclenché : ${request.requestURI}")
+        //println("🟡") only keep the icon before move all icon for log messages in a specific util constant file
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
     }
 }
