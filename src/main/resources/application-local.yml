@@ -11,3 +11,7 @@ server:
     context-path: /svc/auth
 jwt:
   secret: Xv1qj8+0Vd6k2ZGk7RkB0TzJ4GqWJXVy9DfV4bNvl6Y=
+remotes:
+  service-users:
+    url: "http://localhost:8081/svc/users"
+
