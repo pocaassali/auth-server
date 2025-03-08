@@ -3,11 +3,10 @@ package com.poc.authserver.infrastructure.api.user
 import com.poc.authserver.core.application.dto.command.DeleteUserCommand
 import com.poc.authserver.core.application.dto.query.GetUserByIdQuery
 import com.poc.authserver.core.application.ports.input.UserApplicationService
-import com.poc.authserver.infrastructure.api.remote.RemoteRequest
+import com.poc.authserver.infrastructure.api.remote.RemoteUserRegisterRequest
 import com.poc.authserver.infrastructure.api.remote.ServiceUsersFeign
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
-import java.net.HttpRetryException
 import java.util.*
 
 @Component
@@ -25,10 +24,10 @@ class UserAdapter(
     }
 
     fun create(request: UserCreationRequest): UserView? {
-        val remoteRequest = RemoteRequest(request.mail, request.password)
+        val remoteUserRegisterRequest = RemoteUserRegisterRequest(request.mail, request.password)
         return try {
             serviceUsersFeign
-                .registerUser(remoteRequest)
+                .registerUser(remoteUserRegisterRequest)
                 ?.toUserView()
         } catch (e : Exception){
             println(e.message)
