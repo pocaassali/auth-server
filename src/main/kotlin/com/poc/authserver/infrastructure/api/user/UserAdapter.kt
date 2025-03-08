@@ -25,10 +25,15 @@ class UserAdapter(
     }
 
     fun create(request: UserCreationRequest): UserView? {
-        val remoteRequest = RemoteRequest(request.mail,request.password)
-        return serviceUsersFeign
-            .registerUser(remoteRequest)
-            ?.toUserView()
+        val remoteRequest = RemoteRequest(request.mail, request.password)
+        return try {
+            serviceUsersFeign
+                .registerUser(remoteRequest)
+                ?.toUserView()
+        } catch (e : Exception){
+            println(e.message)
+            null
+        }
     }
 
     fun update(id: String, request: UserEditionRequest): UserView? {

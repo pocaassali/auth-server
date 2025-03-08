@@ -1,6 +1,7 @@
 package com.poc.authserver.config
 
 import com.poc.authserver.infrastructure.api.remote.ServiceUsersFeign
+import com.poc.authserver.utils.CustomErrorDecoder
 import feign.Contract
 import feign.Feign
 import feign.Request
@@ -42,6 +43,7 @@ class FeignConfig(
             .encoder(encoder)
             .decoder(decoder)
             .contract(contract)
+            .errorDecoder(CustomErrorDecoder())
             .options(Request.Options(10, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, true))
     }
 
