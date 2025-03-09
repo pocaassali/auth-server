@@ -1,6 +1,5 @@
 package com.poc.authserver.controller.auth
 
-import com.poc.authserver.controller.ApiResponse
 import com.poc.authserver.controller.remote.RemoteUserRegisterRequest
 import com.poc.authserver.controller.remote.ServiceUsersFeign
 import com.poc.authserver.controller.remote.UserView
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 private const val SESSION_COOKIE_NAME = "SESSION_ID"
+typealias ApiResponse = Map<String, Any>
 
 @RestController
 class AuthController(
@@ -38,9 +38,9 @@ class AuthController(
         val sessionId = handleLogin(request, cookieSessionId)?.sessionId
         return if (sessionId != null) {
             response.addCookie(createSessionCookie(sessionId))
-            ResponseEntity.ok(ApiResponse(mapOf("message" to "Login successful")))
+            ResponseEntity.ok(mapOf("message" to "Login successful"))
         } else {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse(mapOf("message" to "Invalid credentials")))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to "Invalid credentials"))
         }
     }
 
@@ -50,11 +50,11 @@ class AuthController(
     ): ResponseEntity<ApiResponse> {
         if (sessionId == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse(mapOf("message" to "Session not found")))
+                .body(mapOf("message" to "Session not found"))
         }
         handleTokensRefresh(sessionId)
 
-        return ResponseEntity.ok(ApiResponse(mapOf("message" to "Access token refreshed")))
+        return ResponseEntity.ok(mapOf("message" to "Access token refreshed"))
     }
 
     @PostMapping("/logout")
@@ -66,10 +66,10 @@ class AuthController(
             handleLogout(it)
             val expiredCookie = createExpiredSessionCookie()
             response.addCookie(expiredCookie)
-            ResponseEntity.ok(ApiResponse(mapOf("message" to "Session with id $cookieSessionId successfully deleted")))
+            ResponseEntity.ok(mapOf("message" to "Session with id $cookieSessionId successfully deleted"))
         } ?: run {
             ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse(mapOf("message" to "No active session found")))
+                .body(mapOf("message" to "No active session found"))
         }
 
 
