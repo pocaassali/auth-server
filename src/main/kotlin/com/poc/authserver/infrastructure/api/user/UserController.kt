@@ -1,6 +1,5 @@
 package com.poc.authserver.infrastructure.api.user
 
-import com.poc.authserver.utils.AuthServerSecurityGuard
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -20,7 +19,8 @@ class UserController(private val userAdapter: UserAdapter) {
     }
 
     @PostMapping
-    fun createUser(@RequestBody request: UserCreationRequest): ResponseEntity<UserView>{
+    fun createUser(@ModelAttribute request: UserCreationRequest): ResponseEntity<UserView>{
+        println(request)
         return ResponseEntity.ok(userAdapter.create(request))
     }
 

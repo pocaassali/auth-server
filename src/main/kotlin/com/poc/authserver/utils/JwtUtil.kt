@@ -39,7 +39,7 @@ class JwtUtil {
             .setSubject(userDetails.username)
             .claim("roles", userDetails.authorities.map { it.authority })
             .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + ONE_HOUR))
+            .setExpiration(Date(System.currentTimeMillis() + 60*1000))
             .signWith(getSignKey(), SignatureAlgorithm.HS256)
             .compact()
     }

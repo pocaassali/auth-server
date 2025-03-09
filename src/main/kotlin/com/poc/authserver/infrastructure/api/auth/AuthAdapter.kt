@@ -1,70 +1,84 @@
 package com.poc.authserver.infrastructure.api.auth
 
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByTokenCommand
-import com.poc.authserver.core.application.dto.command.DeleteRefreshTokenByUserIdCommand
-import com.poc.authserver.core.application.dto.command.SaveRefreshTokenCommand
 import com.poc.authserver.core.application.dto.query.GetUserByIdQuery
 import com.poc.authserver.core.application.ports.input.AuthApplicationService
 import com.poc.authserver.core.application.ports.input.UserApplicationService
+import com.poc.authserver.infrastructure.api.remote.RemoteLoginResponse
+import com.poc.authserver.infrastructure.api.remote.ServiceUsersFeign
+import com.poc.authserver.utils.CustomUserDetails
 import com.poc.authserver.utils.CustomUserDetailsService
+import com.poc.authserver.utils.JwtSessionService
 import com.poc.authserver.utils.JwtUtil
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
-import java.time.Instant
+import java.util.*
 
 @Component
 class AuthAdapter(
-    private val authApplicationService: AuthApplicationService,
     private val passwordEncoder: PasswordEncoder,
     private val jwtUtil: JwtUtil,
-    private val customUserDetailsService: CustomUserDetailsService,
-    private val userApplicationService: UserApplicationService,
+    private val jwtSessionService: JwtSessionService,
+    private val serviceUsersFeign: ServiceUsersFeign,
 ) {
-    fun login(request: LoginRequest): TokensResponse? {
-        val user = authApplicationService.getUserByCredentials(request.toQuery())
+
+    fun loginSessionBased(request: LoginRequest): LoginResponse? {
+        val user = serviceUsersFeign.getUserByCredentials(request.toRemoteRequest())
         if (user != null) {
-            if (passwordEncoder.matches(request.password, user.password.value)) {
-                val customUserDetails = customUserDetailsService.loadUserByUsername(user.identifier.toString())
+            //TODO: if user already log in other session refresh all tokens
+            if (passwordEncoder.matches(request.password, user.password)) {
+                println("generate session")
+                val customUserDetails = CustomUserDetails(
+                    userId = user.identifier,
+                    username = user.identifier,
+                    password = user.password,
+                    authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role}"))
+                )
                 val accessToken = jwtUtil.generateToken(customUserDetails)
                 val refreshToken = jwtUtil.generateRefreshToken(customUserDetails)
-                authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(user.identifier.toString()))
-                val command = SaveRefreshTokenCommand(
-                    refreshToken = refreshToken,
-                    expiresIn = Instant.now().plusSeconds(7 * 86400),
-                    userIdentifier = user.identifier.toString()
-                )
-                val storedRefreshToken = authApplicationService.saveRefreshToken(command)
-                return TokensResponse(accessToken, storedRefreshToken?.token?.value ?: "")
+                val sessionId = UUID.randomUUID().toString()
+
+                jwtSessionService.storeSession(sessionId, accessToken, refreshToken)
+
+                return LoginResponse(sessionId)
             }
         }
+        println("No session create")
         return null
     }
 
-    fun refreshToken(request: RefreshTokenRequest): TokensResponse? {
-        val storedToken = authApplicationService.getToken(request.toQuery())
+    fun refreshTokenSessionBased(sessionId: String) {
+        val sessionData = jwtSessionService.getSession(sessionId) ?: return
 
-        println("STORED TOKEN $storedToken")
-        if (storedToken?.expirationDate?.isBefore(Instant.now()) == true) {
+        println("SESSION DATA $sessionData")
+
+        val refreshToken = sessionData.refreshToken
+        if (jwtUtil.isTokenExpired(refreshToken)) {
             println("expire")
-            authApplicationService.deleteToken(DeleteRefreshTokenByTokenCommand(storedToken.token.value))
+            jwtSessionService.removeSession(sessionId)
         }
         else {
-            val userFromToken = storedToken?.userIdentifier?.let { GetUserByIdQuery(id = it) }
-                ?.let { userApplicationService.getUserById(it) }
 
-            println(userFromToken)
+            val userFromToken = serviceUsersFeign
+                .getUserByIdentifier(jwtUtil.extractUsername(sessionData.refreshToken))
+
+            println("USER FROM TOKEN => $userFromToken")
 
             if (userFromToken != null) {
-                val customUserDetails = customUserDetailsService.loadUserByUsername(userFromToken.identifier.toString())
+
+                val customUserDetails = CustomUserDetails(
+                    userId = userFromToken.identifier,
+                    username = userFromToken.identifier,
+                    password = userFromToken.password,
+                    authorities = listOf(SimpleGrantedAuthority("ROLE_${userFromToken.role}"))
+                )
                 val accessToken = jwtUtil.generateToken(customUserDetails)
-                return TokensResponse(accessToken, request.refreshToken)
+                jwtSessionService.storeSession(sessionId, accessToken, refreshToken)
             }
         }
-
-        return null
     }
 
-    fun logout(request: LogoutRequest) {
-        authApplicationService.deleteToken(DeleteRefreshTokenByUserIdCommand(request.userId))
+    fun logoutSessionBased(sessionId: String) {
+        jwtSessionService.removeSession(sessionId)
     }
 }

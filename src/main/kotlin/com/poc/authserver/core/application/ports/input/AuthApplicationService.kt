@@ -10,7 +10,6 @@ import com.poc.authserver.core.domain.model.User
 interface AuthApplicationService {
     fun getUserByCredentials(query: GetUserByCredentialsQuery) : User?
     fun getToken(query: GetRefreshTokenByTokenQuery) : RefreshToken?
-    //fun deleteToken(command : DeleteRefreshTokenByTokenCommand)
     fun deleteToken(command : DeleteRefreshTokenCommand)
     fun saveRefreshToken(command: SaveRefreshTokenCommand) : RefreshToken?
 }

@@ -18,6 +18,12 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+	imports{
+		mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
+	}
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -26,8 +32,16 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+	implementation("com.squareup.okhttp3:okhttp:4.11.0")
+	implementation("io.github.openfeign:feign-okhttp:13.5")
+	implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

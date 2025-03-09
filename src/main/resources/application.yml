@@ -1,9 +1,17 @@
 spring :
   application :
     name: auth-server
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 server:
   port: 8090
   servlet:
     context-path: /svc/auth
 jwt:
   secret: ${JWT_SECRET:noSecret}
+
+logging:
+  level:
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
