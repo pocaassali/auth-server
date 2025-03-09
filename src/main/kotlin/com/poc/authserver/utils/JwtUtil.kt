@@ -36,17 +36,18 @@ class JwtUtil {
 
     fun generateToken(userDetails: CustomUserDetails): String {
         return Jwts.builder()
-            .setSubject(userDetails.username)
+            .setSubject(userDetails.userId)
             .claim("roles", userDetails.authorities.map { it.authority })
             .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + 60*1000))
+            //.setExpiration(Date(System.currentTimeMillis() + 60*1000))
+            .setExpiration(Date(System.currentTimeMillis() + ONE_HOUR))
             .signWith(getSignKey(), SignatureAlgorithm.HS256)
             .compact()
     }
 
     fun generateRefreshToken(user: CustomUserDetails): String {
         return Jwts.builder()
-            .setSubject(user.username)
+            .setSubject(user.userId)
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + ONE_WEEK))
             .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -68,11 +69,6 @@ class JwtUtil {
 
     fun extractUsername(token: String): String {
         return extractClaim(token) { it.subject }
-    }
-
-    fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
-        val username = extractUsername(token)
-        return username == userDetails.username && !isTokenExpired(token)
     }
 
     fun isTokenExpired(token: String): Boolean {
