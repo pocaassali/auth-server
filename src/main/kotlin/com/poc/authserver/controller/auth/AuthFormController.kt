@@ -1,4 +1,4 @@
-package com.poc.authserver.infrastructure.api.auth
+package com.poc.authserver.controller.auth
 
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model

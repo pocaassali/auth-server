@@ -1,9 +1,5 @@
 package com.poc.authserver.config
 
-import com.poc.authserver.config.SecurityPermissions.PUBLIC_ENDPOINTS
-import com.poc.authserver.filter.JwtSessionFilter
-import com.poc.authserver.utils.CustomAccessDeniedHandler
-import com.poc.authserver.utils.CustomAuthenticationEntryPoint
 import com.poc.authserver.utils.CustomUserDetailsService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,13 +12,11 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
-    private val jwtSessionFilter: JwtSessionFilter,
     private val customUserDetailsService : CustomUserDetailsService
 ) {
 
@@ -38,16 +32,8 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement {it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .authorizeHttpRequests {
-                it.requestMatchers(*PUBLIC_ENDPOINTS.toTypedArray())
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated()
+                it.anyRequest().permitAll()
             }
-            .exceptionHandling {
-                it.authenticationEntryPoint(CustomAuthenticationEntryPoint())
-                it.accessDeniedHandler(CustomAccessDeniedHandler())
-            }
-            .addFilterBefore(jwtSessionFilter, UsernamePasswordAuthenticationFilter::class.java)
             .formLogin { it.disable() }
 
         return http.build()
@@ -64,19 +50,4 @@ class SecurityConfig(
         authProvider.setPasswordEncoder(passwordEncoder())
         return authProvider
     }
-}
-
-object SecurityPermissions {
-    val PUBLIC_ENDPOINTS = listOf(
-        "/login",
-        "/refresh",
-        "/logout",
-        "/signup",
-        "/static/**",
-        "/css/**",
-        "/js/**",
-        "/images/**",
-        "/favicon.ico",
-        "/users" //TODO rename to register
-    )
 }

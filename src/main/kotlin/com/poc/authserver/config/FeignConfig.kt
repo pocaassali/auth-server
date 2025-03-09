@@ -1,6 +1,6 @@
 package com.poc.authserver.config
 
-import com.poc.authserver.infrastructure.api.remote.ServiceUsersFeign
+import com.poc.authserver.controller.remote.ServiceUsersFeign
 import com.poc.authserver.utils.CustomErrorDecoder
 import feign.Contract
 import feign.Feign
